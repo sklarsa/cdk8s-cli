@@ -61,14 +61,14 @@ export class ImportKotsApi extends ImportBase {
 
 
     for (const schemaName in schemas) {
-        const prefix = options.classNamePrefix ?? 'Kots';
+        const prefix = options.classNamePrefix ?? 'KotsApi';
         const schema = schemas[schemaName];
         const o: ApiObjectDefinition = {
             custom: false, // not a CRD
             fqn: 'kots.api.' + schemaName,
             group: 'v1beta1',
-            kind: schemaName,
-            version: '1',
+            kind: schemaName[0].toUpperCase() + schemaName.slice(1),
+            version: '',
             schema: schema,
             prefix,
         }
