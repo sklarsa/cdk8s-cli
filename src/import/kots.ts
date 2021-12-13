@@ -14,12 +14,24 @@ import { ApiObjectDefinition, emitHeader, generateConstruct } from './codegen';
 
 
 export function safeParseJsonSchema(text: string): JSONSchema4 {
+    console.log('hello');
     const reviver = new SafeReviver({
       allowlistedKeys: ['$ref', '$schema'],
       sanitizers: { description: SafeReviver.DESCRIPTION_SANITIZER },
     });
+    console.log(text);
     const schema = safeParseJson(text, reviver);
+    console.log(schema);
     const ajv = new Ajv();
+    ajv.addFormat("byte", {
+        type: "number",
+        validate: (x: number) => x >= 0 && x <= 255 && x % 1 == 0,
+      })
+    ajv.addFormat("date-time", {
+        type: "string",
+        validate: () => true
+    })
+    ajv.addFormat("int64", { type: "string", validate: () => true});
     ajv.compile(schema);
     return schema;
   }
@@ -48,9 +60,8 @@ export class ImportKotsApi extends ImportBase {
     });
 
 
-
     for (const schemaName in schemas) {
-        const prefix = options.classNamePrefix ?? 'Kots'
+        const prefix = options.classNamePrefix ?? 'Kots';
         const schema = schemas[schemaName];
         const o: ApiObjectDefinition = {
             custom: false, // not a CRD
@@ -66,13 +77,11 @@ export class ImportKotsApi extends ImportBase {
 
         // emit construct types (recursive)
         generateConstruct(typeGenerator, o);
-        emitHeader(code, false);
-        code.line(typeGenerator.render());
-
-
-
 
     }
+
+    emitHeader(code, false);
+    code.line(typeGenerator.render());
   }
 }
 
