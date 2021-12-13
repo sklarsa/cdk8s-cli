@@ -3,8 +3,13 @@ import { ImportBase, ImportOptions } from './base';
 import { ImportCustomResourceDefinition } from './crd';
 import { matchCrdsDevUrl } from './crds-dev';
 import { ImportKubernetesApi } from './k8s';
+import { ImportKotsApi } from './kots';
 
 export async function importDispatch(imports: ImportSpec[], argv: any, options: ImportOptions) {
+  const importer = new ImportKotsApi();
+
+  await importer.import(options)
+
   for (const importSpec of imports) {
     const importer = await matchImporter(importSpec, argv);
 
